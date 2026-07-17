@@ -1,0 +1,37 @@
+global using FitPulse.Data;
+global using FitPulse.Configuration;
+global using FitPulse.Models;
+global using FitPulse.Repository;
+global using FitPulse.Services;
+global using FitPulse.Endpoints;
+global using FitPulse.DTO;
+global using FitPulse.Profiles;
+global using FitPulse.Validators;
+global using FitPulse.Grpc;
+global using FitPulse.Pdf;
+global using FitPulse.Middleware;
+global using FitPulse.GraphQL;
+
+global using System.Security.Cryptography;
+global using System.Text;
+global using MimeKit;
+global using MailKit.Net.Smtp;
+global using MailKit.Security;
+global using Grpc.Core;
+global using FluentValidation.AspNetCore;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
+global using MongoDB.Bson;
+global using MongoDB.Bson.Serialization.Attributes;
+global using MongoDB.Driver;
+global using AutoMapper;
+global using FluentValidation;
+global using System.Security.Claims;
+global using Microsoft.AspNetCore.Server.Kestrel.Core;
+global using QuestPDF.Fluent;
+global using QuestPDF.Helpers;
+global using QuestPDF.Infrastructure;
+global using HotChocolate.Data;
+global using KeyNotFoundException = System.Collections.Generic.KeyNotFoundException;
+

@@ -1,0 +1,21 @@
+syntax = "proto3";
+option csharp_namespace = "FitPulse.Grpc";
+
+service Telemetry {
+  rpc RecordReadings (stream TelemetryReadingRequest) returns (TelemetrySummaryResponse);
+}
+
+message TelemetryReadingRequest {
+  int32 session_id = 1;
+  int32 device_id = 2;
+  double power_watts = 3;
+  double speed_or_cadence = 4;
+  double distance_or_reps = 5;
+  int32 heart_rate = 6;
+  double motor_temp = 7;
+}
+
+message TelemetrySummaryResponse {
+  int32 processed_count = 1;
+  string status_message = 2;
+}

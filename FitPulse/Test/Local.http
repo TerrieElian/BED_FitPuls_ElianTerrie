@@ -1,0 +1,290 @@
+@host = http://localhost:5180
+@token = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik96TERHZmNyNUFaY1lZSVV0N2xtMiJ9.eyJpc3MiOiJodHRwczovL2Rldi1oODdrcW52bWppaTI1YzdsLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2YTU3NDQ3OTQ5OTQzMDE2ODQyMjc1MDMiLCJhdWQiOlsiaHR0cHM6Ly9maXRwdWxzZS5hcGkiLCJodHRwczovL2Rldi1oODdrcW52bWppaTI1YzdsLnVzLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3ODQyMTM5MjYsImV4cCI6MTc4NDMwMDMyNiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6IkhDM0lJcDNZVWkzZFJQdlRiY2tGeWFFWDM0UHpnamV3IiwicGVybWlzc2lvbnMiOlsibWFuYWdlOmRldmljZXMiLCJtYW5hZ2U6dGlja2V0cyJdfQ.ZRr-H87BhjI6l-XKQ5OGXPGtaa_oF8DORzYFmG7WOWm_e5aiCBZ6AG69ImnpHjew3Urwk_Am2GPPZBzEfzaEm6cHBIdSt_gIt-grG3agmxIQi2mM_gp9HTKl2V7gGK7Yfa8yLUko6gv061C15Q7d2-RR_19qeCJuu2meeRpC2S32NVT0yu6_c6tQNSKbWy73-0-HRWhm9g4kZ7toY4IKXAHpOpKzEpDwykTGhdU-3uEFpvqZ6fqjPVs7_2lYLHXJqUDXKCPht2cjPz615Nxd-R0TCUfvK7yT7q7el-kVrSQLoH4_8OVhv8PGlUcnLaJc-UiBC787CxIjHq4a-aSqYQ
+
+### Nieuw device aanmaken
+POST {{host}}/devices
+Content-Type: application/json
+
+{
+  "serialNumber": "DEV-001",
+  "locationCode": "Zaal A - Rij 3",
+  "model": "TechnoGym Skillrun",
+  "deviceType": 0,
+  "installationYear": 2024,
+  "isActive": true
+}
+
+### Alle devices ophalen
+GET {{host}}/devices
+
+### 1 device ophalen op id
+GET {{host}}/devices/2
+
+### Device bijwerken
+PUT {{host}}/devices/1
+Content-Type: application/json
+
+{
+  "serialNumber": "DEV-001",
+  "locationCode": "Zaal B - Rij 1",
+  "model": "TechnoGym Skillrun",
+  "deviceType": 0,
+  "installationYear": 2024,
+  "isActive": false
+}
+
+### Device verwijderen
+DELETE {{host}}/devices/1
+
+### Validatie testen: leeg serialNumber (moet 400 geven)
+POST {{host}}/devices
+Content-Type: application/json
+
+{
+  "serialNumber": "",
+  "locationCode": "Zaal A - Rij 3",
+  "model": "TechnoGym Skillrun",
+  "deviceType": 0,
+  "installationYear": 2024,
+  "isActive": true
+}
+
+### Validatie testen: ongeldig installationYear (moet 400 geven)
+POST {{host}}/devices
+Content-Type: application/json
+
+{
+  "serialNumber": "DEV-002",
+  "locationCode": "Zaal A - Rij 3",
+  "model": "TechnoGym Skillrun",
+  "deviceType": 0,
+  "installationYear": 1800,
+  "isActive": true
+}
+
+### Auth0 token ophalen (code omwisselen voor access token)
+POST https://dev-h87kqnvmjii25c7l.us.auth0.com/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&client_id=HC3IIp3YUi3dRPvTbckFyaEX34Pzgjew&code_verifier=mpemuEmFAa1sUVIBqkh7mfMftZNED-xkAClBEjHMs_g&code=Qk9nOJnuRy8sBCHff35CDR1ZC1-9oTN3O4pUGHhQ5XC8D&redirect_uri=http://localhost:5180/callback
+
+### Devices ophalen met geldig token
+GET {{host}}/devices
+Authorization: Bearer {{token}}
+
+### Nieuwe maintenance log aanmaken (gekoppeld aan device 2)
+POST {{host}}/maintenancelogs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceId": 2,
+  "date": "2026-06-01T10:00:00Z",
+  "description": "Kettingolie ververst",
+  "technicianName": "Jan Peeters",
+  "cost": 25.50,
+  "nextServiceDue": "2026-12-01T10:00:00Z"
+}
+
+### Alle maintenance logs ophalen
+GET {{host}}/maintenancelogs
+Authorization: Bearer {{token}}
+
+### 1 maintenance log ophalen op id
+GET {{host}}/maintenancelogs/1
+Authorization: Bearer {{token}}
+
+### Maintenance log bijwerken
+PUT {{host}}/maintenancelogs/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceId": 2,
+  "date": "2026-06-01T10:00:00Z",
+  "description": "Kettingolie ververst + rem nagekeken",
+  "technicianName": "Jan Peeters",
+  "cost": 40.00,
+  "nextServiceDue": "2026-12-01T10:00:00Z"
+}
+
+### Validatie testen: datum in de toekomst (moet 400 geven)
+POST {{host}}/maintenancelogs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceId": 2,
+  "date": "2099-01-01T10:00:00Z",
+  "description": "Test",
+  "technicianName": "Jan Peeters",
+  "cost": 10,
+  "nextServiceDue": null
+}
+
+### Maintenance log verwijderen
+DELETE {{host}}/maintenancelogs/1
+Authorization: Bearer {{token}}
+
+### Eigen memberprofiel ophalen (JIT-provisioning)
+GET {{host}}/members/me
+Authorization: Bearer {{token}}
+
+### Sessie aanvragen (Cardio-toestel = deviceType 0)
+POST {{host}}/trainingsessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceType": 0
+}
+
+### Eigen sessies ophalen
+GET {{host}}/trainingsessions
+Authorization: Bearer {{token}}
+
+### 1 sessie ophalen op id
+GET {{host}}/trainingsessions/4
+Authorization: Bearer {{token}}
+
+### Sessie starten
+PUT {{host}}/trainingsessions/4/start
+Authorization: Bearer {{token}}
+
+### Sessie voltooien
+PUT {{host}}/trainingsessions/4/complete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 30,
+  "caloriesBurned": 250
+}
+
+### Foutieve overgang testen: nogmaals starten (moet 409 geven, sessie is al Completed)
+PUT {{host}}/trainingsessions/1/start
+Authorization: Bearer {{token}}
+
+### Support ticket aanmaken (als lid)
+POST {{host}}/supporttickets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "subject": "Loopband maakt raar geluid",
+  "description": "Toestel DEV-001 maakt een piepend geluid tijdens gebruik.",
+  "priority": 2
+}
+
+### Eigen tickets ophalen (als lid)
+GET {{host}}/supporttickets/mine
+Authorization: Bearer {{token}}
+
+### Alle tickets ophalen (admin, manage:tickets nodig)
+GET {{host}}/supporttickets
+Authorization: Bearer {{token}}
+
+### Ticket-status wijzigen (admin, manage:tickets nodig)
+PUT {{host}}/supporttickets/1/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": 1
+}
+
+### Nieuwe sessie aanvragen (voor de betalings-test, wordt waarschijnlijk id 2)
+POST {{host}}/trainingsessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceType": 0
+}
+
+### Sessie 2 starten
+PUT {{host}}/trainingsessions/2/start
+Authorization: Bearer {{token}}
+
+### Sessie 2 voltooien -> triggert automatisch een Payment
+PUT {{host}}/trainingsessions/2/complete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 45,
+  "caloriesBurned": 350
+}
+
+### Factuur-PDF downloaden voor sessie 2 (verouderde data, negeren)
+GET {{host}}/trainingsessions/2/invoice
+Authorization: Bearer {{token}}
+
+### Verse sessie aanvragen (voor correcte VAT-velden, wordt waarschijnlijk id 3)
+POST {{host}}/trainingsessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceType": 0
+}
+
+### Sessie 3 starten
+PUT {{host}}/trainingsessions/3/start
+Authorization: Bearer {{token}}
+
+### Sessie 3 voltooien
+PUT {{host}}/trainingsessions/3/complete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 45,
+  "caloriesBurned": 350
+}
+
+### Factuur-PDF downloaden voor sessie 3 (moet nu correcte BTW-velden tonen)
+GET {{host}}/trainingsessions/3/invoice
+Authorization: Bearer {{token}}
+
+### Nieuwe sessie voor de e-mail-test (wordt waarschijnlijk id 4)
+POST {{host}}/trainingsessions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "deviceType": 0
+}
+
+### Sessie 4 starten
+PUT {{host}}/trainingsessions/6/start
+Authorization: Bearer {{token}}
+
+### Sessie 4 voltooien -> moet nu automatisch een mail sturen naar test@gmail.com
+PUT {{host}}/trainingsessions/6/complete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "durationMinutes": 45,
+  "caloriesBurned": 350
+}
+
+### GraphQL: sessies + toestel + telemetrie in 1 call
+POST {{host}}/graphql
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "query": "query { trainingSessions { id status device { serialNumber deviceType } telemetryReadings { powerWatts heartRate timestamp } } }"
+}
+
+### GraphQL: devices filteren + sorteren
+POST {{host}}/graphql
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "query": "query { devices(where: { deviceType: { eq: CARDIO } }, order: { serialNumber: ASC }) { id serialNumber deviceType isActive } }"
+}
+

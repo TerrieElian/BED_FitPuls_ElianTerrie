@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: fitpulse-postgres
+    environment:
+      POSTGRES_DB: fitpulse
+      POSTGRES_USER: fitpulse
+      POSTGRES_PASSWORD: fitpulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - fitpulse-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitpulse -d fitpulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo:
+    image: mongo:7
+    container_name: fitpulse-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - fitpulse-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: fitpulse-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+
+volumes:
+  fitpulse-postgres-data:
+  fitpulse-mongo-data:
