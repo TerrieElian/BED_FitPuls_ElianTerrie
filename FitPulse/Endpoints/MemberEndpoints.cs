@@ -17,6 +17,24 @@ public static class MemberEndpoints
             return Results.Ok(mapper.Map<MemberDto>(member));
         });
 
+        group.MapPut("/me", async (
+            UpdateMemberProfileDto dto,
+            ClaimsPrincipal user,
+            IValidator<UpdateMemberProfileDto> validator,
+            IMemberService service,
+            IMapper mapper) =>
+        {
+            var validationResult = await validator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                return Results.BadRequest(validationResult.Errors.Select(e => e.ErrorMessage));
+            }
+
+            var auth0Subject = user.FindFirst("sub")!.Value;
+            var member = await service.UpdateEmailAsync(auth0Subject, dto.Email);
+            return Results.Ok(mapper.Map<MemberDto>(member));
+        });
+
         return group;
     }
 }

@@ -3,6 +3,7 @@ namespace FitPulse.Services;
 public interface IMemberService
 {
     Task<Member> GetOrCreateCurrentMemberAsync(string auth0Subject);
+    Task<Member> UpdateEmailAsync(string auth0Subject, string email);
 }
 
 public class MemberService : IMemberService
@@ -29,5 +30,13 @@ public class MemberService : IMemberService
 
         await _memberRepository.AddAsync(newMember);
         return newMember;
+    }
+
+    public async Task<Member> UpdateEmailAsync(string auth0Subject, string email)
+    {
+        var member = await GetOrCreateCurrentMemberAsync(auth0Subject);
+        member.Email = email;
+        await _memberRepository.UpdateAsync(member);
+        return member;
     }
 }
