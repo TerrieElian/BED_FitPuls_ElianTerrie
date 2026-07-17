@@ -7,8 +7,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compil
 
 COPY . .
 RUN dotnet restore "FitPulse.csproj"
-RUN PROTOBUF_PROTOC=/usr/bin/protoc \
-    GRPC_PROTOC_PLUGIN=$(find /root/.nuget/packages/grpc.tools -name grpc_csharp_plugin -path "*linux_arm64*" | head -1) \
+
+# Enkel op arm64 (bv. Apple Silicon) is de meegeleverde protoc-binary van Grpc.Tools kapot (bekende bug).
+# Op amd64 (o.a. GitHub Actions-runners) werkt de standaard tooling gewoon, dus daar niets aanpassen.
+RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
+        export PROTOBUF_PROTOC=/usr/bin/protoc; \
+        export GRPC_PROTOC_PLUGIN=$(find /root/.nuget/packages/grpc.tools -name grpc_csharp_plugin -path "*linux_arm64*" | head -1); \
+    fi; \
     dotnet publish "FitPulse.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
