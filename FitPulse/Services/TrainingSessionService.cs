@@ -4,7 +4,7 @@ public interface ITrainingSessionService
 {
     Task<TrainingSession> RequestSessionAsync(int memberId, DeviceType deviceType);
     Task<TrainingSession> StartSessionAsync(int sessionId);
-    Task<TrainingSession> CompleteSessionAsync(int sessionId, int durationMinutes, int caloriesBurned);
+    Task<TrainingSession> CompleteSessionAsync(int sessionId, int caloriesBurned);
     Task<TrainingSession> CancelSessionAsync(int sessionId);
     Task<List<TrainingSession>> GetSessionsForMemberAsync(int memberId);
     Task<TrainingSession?> GetSessionByIdAsync(int id);
@@ -55,7 +55,7 @@ public class TrainingSessionService : ITrainingSessionService
         return session;
     }
 
-    public async Task<TrainingSession> CompleteSessionAsync(int sessionId, int durationMinutes, int caloriesBurned)
+    public async Task<TrainingSession> CompleteSessionAsync(int sessionId, int caloriesBurned)
     {
         var session = await GetSessionOrThrowAsync(sessionId);
         if (session.Status != TrainingSessionStatus.InProgress)
@@ -65,7 +65,9 @@ public class TrainingSessionService : ITrainingSessionService
 
         session.Status = TrainingSessionStatus.Completed;
         session.CompletedAt = DateTime.UtcNow;
-        session.DurationMinutes = durationMinutes;
+        // Naar boven afgerond, met een minimum van 1 minuut zodat een razendsnelle testsessie geen "0 minuten" op de factuur geeft.
+        var elapsedMinutes = (session.CompletedAt.Value - session.StartedAt!.Value).TotalMinutes;
+        session.DurationMinutes = Math.Max(1, (int)Math.Ceiling(elapsedMinutes));
         session.CaloriesBurned = caloriesBurned;
         await _sessionRepository.UpdateAsync(session);
         return session;

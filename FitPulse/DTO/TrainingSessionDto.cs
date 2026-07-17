@@ -12,4 +12,5 @@ public class TrainingSessionDto
     public DateTime? CompletedAt { get; set; }
     public int? DurationMinutes { get; set; }
     public int? CaloriesBurned { get; set; }
+    public decimal? PaymentAmount { get; set; }
 }

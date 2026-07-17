@@ -21,6 +21,7 @@ public class TrainingSessionRepository : ITrainingSessionRepository
     {
         return await _context.TrainingSessions
             .Include(s => s.Device)
+            .Include(s => s.Payment)
             .Where(s => s.MemberId == memberId)
             .ToListAsync();
     }
@@ -30,6 +31,7 @@ public class TrainingSessionRepository : ITrainingSessionRepository
         return await _context.TrainingSessions
             .Include(s => s.Device)
             .Include(s => s.Member)
+            .Include(s => s.Payment)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 

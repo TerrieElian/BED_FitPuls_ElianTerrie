@@ -80,7 +80,7 @@ public static class TrainingSessionEndpoints
 
             try
             {
-                var session = await sessionService.CompleteSessionAsync(id, dto.DurationMinutes, dto.CaloriesBurned);
+                var session = await sessionService.CompleteSessionAsync(id, dto.CaloriesBurned);
                 var payment = await paymentService.GenerateForSessionAsync(id, dto.DiscountCode);
 
                 var pdfBytes = invoiceService.GenerateInvoicePdf(payment, session, session.Member);

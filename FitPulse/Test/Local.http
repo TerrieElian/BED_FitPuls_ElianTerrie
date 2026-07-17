@@ -157,7 +157,6 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "durationMinutes": 30,
   "caloriesBurned": 250
 }
 
@@ -212,7 +211,6 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "durationMinutes": 45,
   "caloriesBurned": 350
 }
 
@@ -239,7 +237,6 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "durationMinutes": 45,
   "caloriesBurned": 350
 }
 
@@ -266,7 +263,6 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "durationMinutes": 45,
   "caloriesBurned": 350
 }
 
