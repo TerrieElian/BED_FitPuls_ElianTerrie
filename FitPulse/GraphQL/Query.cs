@@ -1,7 +1,10 @@
+using HotChocolate.Authorization;
+
 namespace FitPulse.GraphQL;
 
 public class Query
 {
+    [Authorize(Policy = "ManageDevices")]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -10,5 +13,13 @@ public class Query
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public IQueryable<TrainingSession> GetTrainingSessions(FitPulseDbContext context) => context.TrainingSessions;
+    public async Task<IQueryable<TrainingSession>> GetTrainingSessions(
+        ClaimsPrincipal user,
+        FitPulseDbContext context,
+        IMemberService memberService)
+    {
+        var auth0Subject = user.FindFirst("sub")!.Value;
+        var member = await memberService.GetOrCreateCurrentMemberAsync(auth0Subject);
+        return context.TrainingSessions.Where(s => s.MemberId == member.Id);
+    }
 }

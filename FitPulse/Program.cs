@@ -1,4 +1,5 @@
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
@@ -40,8 +41,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services
     .AddGraphQLServer()
+    .AddAuthorization()
     .AddQueryType<Query>()
     .AddTypeExtension<TrainingSessionExtensions>()
+    .AddTypeExtension<DeviceExtensions>()
     .AddFiltering()
     .AddSorting()
     .AddProjections();
@@ -75,6 +78,19 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<DeviceValidator>();
 
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseUpper));
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Dashboard", policy =>
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(5180, listenOptions =>
@@ -95,6 +111,8 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+app.UseCors("Dashboard");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -108,7 +126,7 @@ app.MapGroup("/trainingsessions").RequireAuthorization().MapTrainingSessionEndpo
 
 app.MapGroup("/supporttickets").RequireAuthorization().MapSupportTicketEndpoints();
 
-app.MapGraphQL("/graphql").RequireAuthorization("ManageDevices");
+app.MapGraphQL("/graphql").RequireAuthorization();
 
 app.UseWhen(
     context => context.Connection.LocalPort == 5181,
