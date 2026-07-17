@@ -67,3 +67,5 @@ nunit-*.xml
 
 # Built Visual Studio Code Extensions
 *.vsix
+__azurite_db_blob__.json
+__azurite_db_blob_extent__.json
