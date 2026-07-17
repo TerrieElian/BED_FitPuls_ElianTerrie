@@ -36,6 +36,32 @@ services:
       - "1025:1025" # SMTP
       - "8025:8025" # Web UI
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitpulse-api
+    ports:
+      - "5180:5180" # REST + GraphQL
+      - "5181:5181" # gRPC
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__PostgresConnection: "Host=postgres;Port=5432;Database=fitpulse;Username=fitpulse;Password=fitpulse"
+      MongoSettings__ConnectionString: "mongodb://mongo:27017"
+      MongoSettings__DatabaseName: "fitpulse"
+      Smtp__Host: "mailhog"
+      Smtp__Port: "1025"
+      Smtp__FromAddress: "noreply@fitpulse.be"
+      Auth0__Domain: "dev-h87kqnvmjii25c7l.us.auth0.com"
+      Auth0__Audience: "https://fitpulse.api"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+
 volumes:
   fitpulse-postgres-data:
   fitpulse-mongo-data:
