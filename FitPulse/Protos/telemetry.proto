@@ -3,6 +3,7 @@ option csharp_namespace = "FitPulse.Grpc";
 
 service Telemetry {
   rpc RecordReadings (stream TelemetryReadingRequest) returns (TelemetrySummaryResponse);
+  rpc ReportDiagnostic (SensorDiagnosticRequest) returns (SensorDiagnosticResponse);
 }
 
 message TelemetryReadingRequest {
@@ -18,4 +19,16 @@ message TelemetryReadingRequest {
 message TelemetrySummaryResponse {
   int32 processed_count = 1;
   string status_message = 2;
+}
+
+message SensorDiagnosticRequest {
+  int32 device_id = 1;
+  string sensor_type = 2;
+  string error_code = 3;
+  string severity = 4;
+  string raw_sensor_data_json = 5;
+}
+
+message SensorDiagnosticResponse {
+  bool accepted = 1;
 }

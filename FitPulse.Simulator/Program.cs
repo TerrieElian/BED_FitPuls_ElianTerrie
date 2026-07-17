@@ -7,7 +7,7 @@ var client = new Telemetry.TelemetryClient(channel);
 
 var random = new Random();
 const int deviceId = 2;
-const int sessionId = 1;
+var sessionId = args.Length > 0 ? int.Parse(args[0]) : 1;
 const string apiKey = "45e9fd7b-757c-419d-89d0-11e3aeda4678";
 
 Console.WriteLine($"Simulator gestart, verbind met {grpcUrl} (device {deviceId}, sessie {sessionId})");
@@ -19,6 +19,9 @@ var headers = new Grpc.Core.Metadata
 };
 
 using var call = client.RecordReadings(headers);
+
+string[] sensorTypes = { "Loopbandsensor", "Hartslagsensor", "Motor/Load-cell" };
+string[] severities = { "Warning", "Critical" };
 
 for (var i = 0; i < 10; i++)
 {
@@ -35,6 +38,22 @@ for (var i = 0; i < 10; i++)
 
     await call.RequestStream.WriteAsync(reading);
     Console.WriteLine($"Verstuurd: {reading.PowerWatts}W, {reading.HeartRate} bpm");
+
+    // Af en toe (~20% kans) ook een sensordiagnostiek-log sturen
+    if (random.Next(100) < 20)
+    {
+        var diagnostic = new SensorDiagnosticRequest
+        {
+            DeviceId = deviceId,
+            SensorType = sensorTypes[random.Next(sensorTypes.Length)],
+            ErrorCode = $"ERR-{random.Next(100, 999)}",
+            Severity = severities[random.Next(severities.Length)],
+            RawSensorDataJson = "{\"raw\": \"" + Guid.NewGuid() + "\"}"
+        };
+
+        var diagnosticResponse = await client.ReportDiagnosticAsync(diagnostic, headers);
+        Console.WriteLine($"Sensordiagnostiek verstuurd: {diagnostic.SensorType} - {diagnostic.ErrorCode} (geaccepteerd: {diagnosticResponse.Accepted})");
+    }
 
     await Task.Delay(2000);
 }

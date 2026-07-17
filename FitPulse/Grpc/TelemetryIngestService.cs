@@ -39,4 +39,23 @@ public class TelemetryIngestService : Telemetry.TelemetryBase
             StatusMessage = "Telemetrie-stream succesvol verwerkt."
         };
     }
+
+    public override async Task<SensorDiagnosticResponse> ReportDiagnostic(
+    SensorDiagnosticRequest request,
+    ServerCallContext context)
+    {
+        var log = new SensorDiagnosticLog
+        {
+            DeviceId = request.DeviceId,
+            SensorType = request.SensorType,
+            ErrorCode = request.ErrorCode,
+            Severity = request.Severity,
+            Timestamp = DateTime.UtcNow,
+            RawSensorDataJson = request.RawSensorDataJson
+        };
+
+        await _mongoContext.SensorDiagnosticLogs.InsertOneAsync(log);
+
+        return new SensorDiagnosticResponse { Accepted = true };
+    }
 }
