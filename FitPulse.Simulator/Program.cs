@@ -8,7 +8,7 @@ var client = new Telemetry.TelemetryClient(channel);
 var random = new Random();
 const int deviceId = 2;
 var sessionId = args.Length > 0 ? int.Parse(args[0]) : 1;
-const string apiKey = "45e9fd7b-757c-419d-89d0-11e3aeda4678";
+var apiKey = Environment.GetEnvironmentVariable("DEVICE_API_KEY") ?? "VUL_HIER_JE_EIGEN_DEVICE_API_KEY_IN";
 
 Console.WriteLine($"Simulator gestart, verbind met {grpcUrl} (device {deviceId}, sessie {sessionId})");
 

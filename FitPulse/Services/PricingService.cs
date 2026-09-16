@@ -76,6 +76,7 @@ public class PricingService : IPricingService
         DeviceType.Cardio => 1.0m,
         DeviceType.Strength => 1.5m,
         DeviceType.Premium => 2.2m,
+        DeviceType.UltraPremium => 3.0m,
         _ => throw new ArgumentOutOfRangeException(nameof(deviceType))
     };
 
